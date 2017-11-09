@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.homework.controllers.AuthorizationViewController">
+   <children>
+      <Button fx:id="loginButton" layoutX="135.0" layoutY="188.0" mnemonicParsing="false" onAction="#loginPress" text="Login" AnchorPane.leftAnchor="200.0" AnchorPane.topAnchor="220.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="signUpButton" layoutX="300.0" layoutY="191.0" mnemonicParsing="false" onAction="#signUpPress" text="Sign up" AnchorPane.leftAnchor="300.0" AnchorPane.topAnchor="220.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <PasswordField fx:id="passwordField" layoutX="200.0" layoutY="131.0" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="150.0" />
+      <TextField fx:id="emailField" layoutX="200.0" layoutY="77.0" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="100.0" />
+      <Label layoutX="98.0" layoutY="81.0" text="Email" AnchorPane.rightAnchor="395.0" AnchorPane.topAnchor="100.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="91.0" layoutY="130.0" text="Password" AnchorPane.rightAnchor="395.0" AnchorPane.topAnchor="150.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="259.0" layoutY="49.0" text="Welcome" AnchorPane.topAnchor="50.0">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="emailWrongLabel" layoutX="250.0" layoutY="127.0" textFill="#fc0000" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="130.0" />
+      <Label fx:id="passwordWrongLabel" layoutX="260.0" layoutY="137.0" textFill="#fc0000" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="180.0" />
+   </children>
+</AnchorPane>
