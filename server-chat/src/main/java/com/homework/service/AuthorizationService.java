@@ -3,8 +3,6 @@ package com.homework.service;
 import com.homework.entity.User;
 import com.homework.repository.SqlRequest;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -22,19 +20,7 @@ public class AuthorizationService {
         userMap.put("email", user.getEmail());
         userMap.put("password", user.getPassword());
 
-        ResultSet select = sqlRequest.selectWithConditions(nameOfTable, columns, userMap);
-        try {
-            if (select.next()) {
-                String email = select.getString("email");
-                String password = select.getString("password");
-                return new User(email, password);
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return sqlRequest.selectWithConditions(nameOfTable, columns, userMap);
     }
 
     public User register(User user) {

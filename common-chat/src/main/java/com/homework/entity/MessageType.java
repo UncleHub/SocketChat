@@ -10,5 +10,6 @@ public enum MessageType implements Serializable{
     PUBLIC_MESSAGE,
     LOGINIZATION,
     REGISTRATION,
-    EXIT
+    USER_DISCONNECTED,
+    USER_CONNECTED
 }

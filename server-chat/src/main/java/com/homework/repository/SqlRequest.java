@@ -1,5 +1,7 @@
 package com.homework.repository;
 
+import com.homework.entity.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -11,8 +13,7 @@ public class SqlRequest {
 
     DataBaseHandler dataBase = DataBaseHandler.getInstance();
 
-    public ResultSet selectWithConditions(String tableName, String columns, HashMap<String, Object> map) {
-        ResultSet select = null;
+    public User selectWithConditions(String tableName, String columns, HashMap<String, Object> map) {
         Set<Map.Entry<String, Object>> entries = map.entrySet();
         StringJoiner allCondition = new StringJoiner(" AND ");
         for (Map.Entry<String, Object> oneOfItem : entries) {
@@ -25,15 +26,17 @@ public class SqlRequest {
 
         try {
             dataBase.createConnection();
-            select = dataBase.select(sqlSelect);
+            ResultSet select = dataBase.select(sqlSelect);
+            return new User(select.getString("email"), select.getString("password"));
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeDataBase();
         }
-
-        return select;
+        return null;
     }
 
     public boolean insert(String tableName, HashMap<String, Object> map) {
@@ -55,8 +58,18 @@ public class SqlRequest {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeDataBase();
         }
         return false;
+    }
+
+    private void closeDataBase() {
+        try {
+            dataBase.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean update(String tableName, String whereCondition, HashMap<String, Object> map) {

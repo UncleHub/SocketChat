@@ -47,8 +47,11 @@ public class ConnectionService {
             Message message = new Message(MessageType.LOGINIZATION, user);
             outputStream.writeObject(message);
             Message receivedMessage = ( Message ) objectInputStream.readObject();
+            receivedMessage.getUsersEmailSet().forEach(System.out::println);
             User receivedUser = receivedMessage.getUser();
+            Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
+            Context.getInstance().setServerListener(serverListener);
             serverListener.start();
             return receivedUser;
 
@@ -69,7 +72,9 @@ public class ConnectionService {
             outputStream.writeObject(message);
             Message receivedMessage = ( Message ) objectInputStream.readObject();
             User receivedUser = receivedMessage.getUser();
+            Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
+            Context.getInstance().setServerListener(serverListener);
             serverListener.start();
             return receivedUser;
 
@@ -81,17 +86,6 @@ public class ConnectionService {
             return null;
         }
 
-        /*User receivedUser = null;
-        try {
-            Message message = new Message(MessageType.REGISTRATION, user);
-            outputStream.writeObject(message);
-            Message receivedMessage = ( Message ) objectInputStream.readObject();
-            receivedUser = receivedMessage.getUser();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }*/
 // TODO use log4j
     }
 
@@ -105,4 +99,7 @@ public class ConnectionService {
 
     }
 
+    public void privateMessage(String text, String tabName) {
+        Message message = new Message(MessageType.PRIVATE_MESSAGE, Context.getInstance().getUser(), text, tabName);
+    }
 }

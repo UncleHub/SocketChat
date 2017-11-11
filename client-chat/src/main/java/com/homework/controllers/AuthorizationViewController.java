@@ -3,6 +3,7 @@ package com.homework.controllers;
 import com.homework.entity.User;
 import com.homework.service.AuthorizationService;
 import com.homework.utils.Context;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -73,11 +74,18 @@ public class AuthorizationViewController {
     }
 
     public void setWindow(String name, String title, ActionEvent actionEvent) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getClassLoader().getResource(name));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource(name));
+        Parent parent = fxmlLoader.load();
+        ChatWindowController controller = fxmlLoader.getController();
         Scene scene = new Scene(parent);
         Stage nextStage = ( Stage ) (( Node ) actionEvent.getSource()).getScene().getWindow();
+        nextStage.setOnHidden(e -> {
+            controller.shutdown();
+            Platform.exit();
+        });
         nextStage.setScene(scene);
         nextStage.setTitle(title);
+
         nextStage.show();
     }
 }

@@ -15,24 +15,19 @@ public class ServerListener extends Thread {
     ObjectInputStream objectInputStream;
 
     public ServerListener(ObjectInputStream objectInputStream) {
-        this.objectInputStream=objectInputStream;
+        this.objectInputStream = objectInputStream;
     }
+
+    boolean listening = true;
 
     @Override
     public void run() {
 
         try {
-            ArrayBlockingQueue<Message> chatMessages = Context.getInstance().getChatMessages();
-
-            while (true) {
-
+            ArrayBlockingQueue<Message> chatMessagesQueue = Context.getInstance().getChatMessages();
+            while (listening) {
                 Message message = ( Message ) objectInputStream.readObject();
-
-                switch (message.getMessageType()){
-                    case PUBLIC_MESSAGE:
-                        chatMessages.add(message);
-                        break;
-                }
+                chatMessagesQueue.add(message);
             }
 
         } catch (IOException e) {
@@ -40,6 +35,12 @@ public class ServerListener extends Thread {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public void shutdown() {
+
+        listening = false;
 
     }
 }
