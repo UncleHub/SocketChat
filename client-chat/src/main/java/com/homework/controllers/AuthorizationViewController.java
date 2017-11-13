@@ -45,7 +45,7 @@ public class AuthorizationViewController {
                 Context.getInstance().setUser(approvedUser);
                 logger.info("user join");
                 try {
-                    setWindow("chatWindow.fxml", "Chat", actionEvent);
+                    setWindow("chatWindow.fxml", "chat user: "+Context.getInstance().getUser().getEmail(), actionEvent);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -69,7 +69,7 @@ public class AuthorizationViewController {
                 Context.getInstance().setUser(approvedUser);
                 logger.info("user sign upp successfully");
                 try {
-                    setWindow("chatWindow.fxml", "Chat", actionEvent);
+                    setWindow("chatWindow.fxml", "chat user: "+Context.getInstance().getUser().getEmail(), actionEvent);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

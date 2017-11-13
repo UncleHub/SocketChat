@@ -10,39 +10,31 @@ import java.util.Set;
 public class Message implements Serializable {
 
     private MessageType messageType;
-    private User user;
+    private User sanderUser;
     private String text;
     HashSet<String> usersEmailSet;
     private String receiverOfTheMessage;
-    private String sanderOfMessage;
 
     public Message(MessageType messageType, User user, Set<String> usersEmailSet) {
         this.messageType = messageType;
-        this.user = user;
+        this.sanderUser = user;
         this.usersEmailSet = new HashSet<>(usersEmailSet);
-    }
-
-    public Message(MessageType messageType, User user, String text, Set<String> userEmail) {
-        this.messageType = messageType;
-        this.user = user;
-        this.text = text;
-        this.usersEmailSet = new HashSet<>(userEmail);
     }
 
     public Message(MessageType messageType, User user) {
         this.messageType = messageType;
-        this.user = user;
+        this.sanderUser = user;
     }
 
     public Message(MessageType messageType, User user, String text) {
         this.messageType = messageType;
-        this.user = user;
+        this.sanderUser = user;
         this.text = text;
     }
 
     public Message(MessageType messageType, User user, String text, String receiverOfTheMessage) {
         this.messageType = messageType;
-        this.user = user;
+        this.sanderUser = user;
         this.text = text;
         this.receiverOfTheMessage = receiverOfTheMessage;
     }
@@ -55,12 +47,12 @@ public class Message implements Serializable {
         this.messageType = messageType;
     }
 
-    public User getUser() {
-        return user;
+    public User getSanderUser() {
+        return sanderUser;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setSanderUser(User sanderUser) {
+        this.sanderUser = sanderUser;
     }
 
     public String getText() {
@@ -87,28 +79,14 @@ public class Message implements Serializable {
         this.receiverOfTheMessage = receiverOfTheMessage;
     }
 
-    public String getSender() {
-        return sanderOfMessage;
-    }
-
-    public void setSanderOfMessage(String sanderOfMessage) {
-        this.sanderOfMessage = sanderOfMessage;
-    }
-
-    public Message(MessageType messageType, String text, String receiverOfTheMessage, String sanderOfMessage) {
-        this.messageType = messageType;
-        this.text = text;
-        this.receiverOfTheMessage = receiverOfTheMessage;
-        this.sanderOfMessage = sanderOfMessage;
-    }
-
     @Override
     public String toString() {
         return "Message{" +
                 "messageType=" + messageType +
-                ", user=" + user +
+                ", sanderUser=" + sanderUser +
                 ", text='" + text + '\'' +
                 ", usersEmailSet=" + usersEmailSet +
+                ", receiverOfTheMessage='" + receiverOfTheMessage + '\'' +
                 '}';
     }
 }

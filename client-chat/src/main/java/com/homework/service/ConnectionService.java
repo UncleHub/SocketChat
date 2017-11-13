@@ -50,7 +50,7 @@ public class ConnectionService {
             outputStream.writeObject(message);
             Message receivedMessage = ( Message ) objectInputStream.readObject();
             logger.info("received message from server, while login\n"+receivedMessage.toString());
-            User receivedUser = receivedMessage.getUser();
+            User receivedUser = receivedMessage.getSanderUser();
             Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
             Context.getInstance().setServerListener(serverListener);
@@ -74,7 +74,7 @@ public class ConnectionService {
             Message receivedMessage = ( Message ) objectInputStream.readObject();
 
             logger.info("received message from server, while sign in\n"+receivedMessage.toString());
-            User receivedUser = receivedMessage.getUser();
+            User receivedUser = receivedMessage.getSanderUser();
             Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
             Context.getInstance().setServerListener(serverListener);
@@ -94,6 +94,7 @@ public class ConnectionService {
         Message message = new Message(MessageType.PUBLIC_MESSAGE, Context.getInstance().getUser(), text);
         try {
             outputStream.writeObject(message);
+            logger.info("public message sand");
         } catch (IOException e) {
             logger.error("public message failed",e);
         }
@@ -103,8 +104,10 @@ public class ConnectionService {
         Message message = new Message(MessageType.PRIVATE_MESSAGE, Context.getInstance().getUser(), text, tabName);
         try {
             outputStream.writeObject(message);
+            logger.info("private message sand to "+tabName);
         } catch (IOException e) {
-            logger.error("private message failed",e);
+            logger.error("private message to "+tabName+" failed",e);
+
         }
     }
 }

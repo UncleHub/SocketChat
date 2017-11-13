@@ -5,6 +5,7 @@ import com.homework.entity.MessageType;
 import com.homework.listener.ServerListener;
 import com.homework.service.ChatWindowService;
 import com.homework.utils.Context;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -38,39 +39,18 @@ public class ChatWindowController {
     public void initialize() {
 
         logger.info("initialize chat window");
-        Tab mainChatTab = getNewTab("Main Chat");
+        getNewTab("Main Chat");
+
 
 
         Thread thread = new Thread(() -> {
             ArrayBlockingQueue<Message> chatMessages = Context.getInstance().getChatMessages();
             Message message;
+
             try {
                 while ((message = chatMessages.take()) != null && listening) {
-                    MessageType messageType = message.getMessageType();
-                    String email = message.getUser().getEmail();
-                    switch (messageType) {
-                        case PUBLIC_MESSAGE: {
-
-                            handlePublicMessage(message);
-                            break;
-                        }
-                        case PRIVATE_MESSAGE: {
-
-                            handlePrivateMessage(message);
-                            break;
-                        }
-                        case USER_CONNECTED: {
-
-                            usersList.getItems().add(email);
-                            break;
-
-                        }
-                        case USER_DISCONNECTED: {
-                            usersList.getItems().remove(email);
-                            tabPanel.getTabs().remove(tabsMap.get(email));
-                            break;
-                        }
-                    }
+                    final Message newMessage = message;
+                    Platform.runLater(() -> processMessage(newMessage));
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -80,29 +60,58 @@ public class ChatWindowController {
         usersList.getItems().addAll(Context.getInstance().getUsersEmailSet());
     }
 
+    private void processMessage(Message message) {
+        MessageType messageType = message.getMessageType();
+        String email = message.getSanderUser().getEmail();
+        switch (messageType) {
+            case PUBLIC_MESSAGE: {
+
+                handlePublicMessage(message);
+                break;
+            }
+            case PRIVATE_MESSAGE: {
+
+                handlePrivateMessageReceived(message);
+                break;
+            }
+            case USER_CONNECTED: {
+
+                usersList.getItems().add(email);
+                handlePublicMessage(message);
+                //TODO передалать на сервере сообщение
+                break;
+
+            }
+            case USER_DISCONNECTED: {
+                usersList.getItems().remove(email);
+                tabPanel.getTabs().remove(tabsMap.get(email));
+                //TODO проверить все потоки
+                break;
+            }
+        }
+    }
+
     private void handlePublicMessage(Message message) {
         Tab tab = tabsMap.get("Main Chat");
-        addMessage(message,tab);
-
+        addMessage(message, tab);
     }
 
     public void shutdown() {
-
         ServerListener serverListener = Context.getInstance().getServerListener();
         serverListener.shutdown();
         listening = false;
     }
 
-    private void handlePrivateMessage(Message message) {
-        if (message.getSender().equals(Context.getInstance().getUser().getEmail())) {
+    private void handlePrivateMessageReceived(Message message) {
+        if (message.getSanderUser().getEmail().equals(Context.getInstance().getUser().getEmail())) {
             Tab tab = tabsMap.get(message.getReceiver());
             addMessage(message, tab);
         } else {
-            if (tabsMap.containsKey(message.getSender())) {
-                Tab tab = tabsMap.get(message.getSender());
+            if (tabsMap.containsKey(message.getSanderUser().getEmail())) {
+                Tab tab = tabsMap.get(message.getSanderUser().getEmail());
                 addMessage(message, tab);
             } else {
-                Tab tab = openTab(message.getSender());
+                Tab tab = openTab(message.getSanderUser().getEmail());
                 addMessage(message, tab);
             }
         }
@@ -110,7 +119,8 @@ public class ChatWindowController {
 
     private void addMessage(Message message, Tab tab) {
         ListView<String> listView = getListView(tab);
-        listView.getItems().add(message.getText());
+        String text =message.getSanderUser().getEmail()+ " write: "+message.getText();
+        listView.getItems().add(text);
     }
 
     public void sendMessage(ActionEvent actionEvent) {
@@ -138,8 +148,8 @@ public class ChatWindowController {
     public Tab getNewTab(String email) {
 
         Tab tab = new Tab(email, chatWindowService.getTabContent());
-        tab.setDisable(false);
-        tab.setClosable(true);
+        //tab.setDisable(false);
+        //tab.setClosable(true);
         tabPanel.getTabs().add(tab);
         tabsMap.put(email, tab);
         return tab;
@@ -148,7 +158,6 @@ public class ChatWindowController {
     private ListView<String> getListView(Tab tab) {
         AnchorPane tabContent = ( AnchorPane ) tab.getContent();
         ObservableList<Node> children = tabContent.getChildren();
-
         return ( ListView<String> ) children.get(0);
     }
 
