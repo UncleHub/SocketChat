@@ -5,6 +5,7 @@ import com.homework.entity.MessageType;
 import com.homework.entity.User;
 import com.homework.listener.ServerListener;
 import com.homework.utils.Context;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,6 +19,7 @@ import java.net.UnknownHostException;
  */
 public class ConnectionService {
 
+    final static Logger logger = Logger.getLogger(ConnectionService.class);
 
     private Socket clientSocket;
     private ObjectOutputStream outputStream;
@@ -32,13 +34,13 @@ public class ConnectionService {
 
             objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 
+            logger.info("start of connection with server");
 
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            logger.error("connection with server denied",e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("connection with server denied",e);
         }
-
     }
 
     public User login(User user) {
@@ -47,7 +49,7 @@ public class ConnectionService {
             Message message = new Message(MessageType.LOGINIZATION, user);
             outputStream.writeObject(message);
             Message receivedMessage = ( Message ) objectInputStream.readObject();
-            receivedMessage.getUsersEmailSet().forEach(System.out::println);
+            logger.info("received message from server, while login\n"+receivedMessage.toString());
             User receivedUser = receivedMessage.getUser();
             Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
@@ -56,13 +58,12 @@ public class ConnectionService {
             return receivedUser;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("login failed",e);
             return null;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("login failed",e);
             return null;
         }
-// TODO use log4j
     }
 
     public User signUp(User user) {
@@ -71,6 +72,8 @@ public class ConnectionService {
             Message message = new Message(MessageType.REGISTRATION, user);
             outputStream.writeObject(message);
             Message receivedMessage = ( Message ) objectInputStream.readObject();
+
+            logger.info("received message from server, while sign in\n"+receivedMessage.toString());
             User receivedUser = receivedMessage.getUser();
             Context.getInstance().setUsersEmailSet(receivedMessage.getUsersEmailSet());
             ServerListener serverListener = new ServerListener(objectInputStream);
@@ -79,14 +82,12 @@ public class ConnectionService {
             return receivedUser;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("sign up failed",e);
             return null;
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("sign up failed",e);
             return null;
         }
-
-// TODO use log4j
     }
 
     public void publicMessage(String text) {
@@ -94,12 +95,16 @@ public class ConnectionService {
         try {
             outputStream.writeObject(message);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("public message failed",e);
         }
-
     }
 
     public void privateMessage(String text, String tabName) {
         Message message = new Message(MessageType.PRIVATE_MESSAGE, Context.getInstance().getUser(), text, tabName);
+        try {
+            outputStream.writeObject(message);
+        } catch (IOException e) {
+            logger.error("private message failed",e);
+        }
     }
 }

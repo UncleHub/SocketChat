@@ -5,17 +5,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 
 import java.io.IOException;
-import java.util.LinkedList;
 
 /**
  * Created by Serega on 07.11.2017.
  */
 public class ChatWindowService {
-
-
-    public LinkedList getUserList() {
-        return null;
-    }
 
     public void sendMessage(String text, String tabName) {
         ConnectionService connectionService = Context.getInstance().getConnectionService();
@@ -24,10 +18,6 @@ public class ChatWindowService {
         } else{
             connectionService.privateMessage(text,tabName);
         }
-    }
-
-    public void privateMessage(String email) {
-
     }
 
     public Node getTabContent() {

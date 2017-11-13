@@ -14,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
@@ -21,6 +22,8 @@ import java.io.IOException;
  * Created by Serega on 05.11.2017.
  */
 public class AuthorizationViewController {
+
+    final static Logger logger = Logger.getLogger(AuthorizationViewController.class);
 
 
     public Label emailWrongLabel;
@@ -32,6 +35,7 @@ public class AuthorizationViewController {
 
     public void loginPress(ActionEvent actionEvent) {
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
+            logger.info("user try to login");
 
             User user = new User(emailField.getText(), passwordField.getText());
 
@@ -39,7 +43,7 @@ public class AuthorizationViewController {
             User approvedUser = authorizationService.login(user);
             if (approvedUser != null) {
                 Context.getInstance().setUser(approvedUser);
-                System.out.println("user was put in context");
+                logger.info("user join");
                 try {
                     setWindow("chatWindow.fxml", "Chat", actionEvent);
                 } catch (IOException e) {
@@ -48,7 +52,7 @@ public class AuthorizationViewController {
             } else {
                 emailWrongLabel.setText("Some thing gone wrong.");
                 passwordWrongLabel.setText("May be password incorrect.");
-                System.out.println("no user in context");
+                logger.error("user was refused for login");
             }
         }
     }
@@ -57,11 +61,13 @@ public class AuthorizationViewController {
         passwordWrongLabel.setText(" ");
         if (!emailField.getText().isEmpty() && !passwordField.getText().isEmpty()) {
             User user = new User(emailField.getText(), passwordField.getText());
+            logger.info("user try to sign up");
 
             AuthorizationService authorizationService = new AuthorizationService();
             User approvedUser = authorizationService.signUpUser(user);
             if (approvedUser != null) {
                 Context.getInstance().setUser(approvedUser);
+                logger.info("user sign upp successfully");
                 try {
                     setWindow("chatWindow.fxml", "Chat", actionEvent);
                 } catch (IOException e) {
@@ -69,6 +75,7 @@ public class AuthorizationViewController {
                 }
             } else {
                 emailWrongLabel.setText("User with this email already exists");
+                logger.error("sign up was denied");
             }
         }
     }

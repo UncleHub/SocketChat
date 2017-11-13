@@ -29,13 +29,11 @@ public class ServerListener extends Thread {
                 Message message = ( Message ) objectInputStream.readObject();
                 chatMessagesQueue.add(message);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     public void shutdown() {

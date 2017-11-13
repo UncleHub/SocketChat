@@ -5,12 +5,12 @@ import com.homework.entity.MessageType;
 import com.homework.listener.ServerListener;
 import com.homework.service.ChatWindowService;
 import com.homework.utils.Context;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,13 +19,17 @@ import java.util.concurrent.ArrayBlockingQueue;
  * Created by Serega on 05.11.2017.
  */
 public class ChatWindowController {
+
+    final static Logger logger = Logger.getLogger(ChatWindowController.class);
+
+
     public TabPane tabPanel;
     public ListView usersList;
     public Button sendButton;
     public TextField messageField;
     public Button openPrivateMessageTabButton;
 
-    boolean listening= true;
+    boolean listening = true;
 
     ChatWindowService chatWindowService = new ChatWindowService();
 
@@ -33,6 +37,7 @@ public class ChatWindowController {
 
     public void initialize() {
 
+        logger.info("initialize chat window");
         Tab mainChatTab = getNewTab("Main Chat");
 
 
@@ -41,13 +46,12 @@ public class ChatWindowController {
             Message message;
             try {
                 while ((message = chatMessages.take()) != null && listening) {
-                    System.out.println("message =" + message.toString());
                     MessageType messageType = message.getMessageType();
                     String email = message.getUser().getEmail();
                     switch (messageType) {
                         case PUBLIC_MESSAGE: {
-                            ListView mainChatList = ( ListView ) mainChatTab.getContent();
-                            mainChatList.getItems().add(email + " write: " + message.getText());
+
+                            handlePublicMessage(message);
                             break;
                         }
                         case PRIVATE_MESSAGE: {
@@ -72,10 +76,14 @@ public class ChatWindowController {
                 e.printStackTrace();
             }
         });
-        Platform.runLater(thread);
-
-        //thread.start();
+        thread.start();
         usersList.getItems().addAll(Context.getInstance().getUsersEmailSet());
+    }
+
+    private void handlePublicMessage(Message message) {
+        Tab tab = tabsMap.get("Main Chat");
+        addMessage(message,tab);
+
     }
 
     public void shutdown() {
@@ -97,7 +105,6 @@ public class ChatWindowController {
                 Tab tab = openTab(message.getSender());
                 addMessage(message, tab);
             }
-
         }
     }
 
@@ -141,6 +148,7 @@ public class ChatWindowController {
     private ListView<String> getListView(Tab tab) {
         AnchorPane tabContent = ( AnchorPane ) tab.getContent();
         ObservableList<Node> children = tabContent.getChildren();
+
         return ( ListView<String> ) children.get(0);
     }
 

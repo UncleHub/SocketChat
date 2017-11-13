@@ -2,6 +2,7 @@ import com.homework.entity.Message;
 import com.homework.entity.MessageType;
 import com.homework.entity.User;
 import com.homework.service.AuthorizationService;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,6 +16,8 @@ import java.util.Set;
  * Created by Serega on 06.11.2017.
  */
 public class ClientSocketThread extends Thread {
+
+    final static Logger logger = Logger.getLogger(ClientSocketThread.class);
 
     private Socket socket;
     private ObjectOutputStream outputStream;
@@ -48,6 +51,7 @@ public class ClientSocketThread extends Thread {
 
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
+
             boolean streaming = true;
 
             while (streaming) {
@@ -55,6 +59,7 @@ public class ClientSocketThread extends Thread {
                 Message inputMessage = ( Message ) objectInputStream.readObject();
                 MessageType messageType = inputMessage.getMessageType();
                 User messageUser = inputMessage.getUser();
+                logger.info("received message"+ inputMessage.toString());
                 switch (messageType) {
                     case USER_DISCONNECTED: {
                         Message message = new Message(MessageType.USER_DISCONNECTED, messageUser, messageUser.getEmail() + " has disconnected");
@@ -62,6 +67,7 @@ public class ClientSocketThread extends Thread {
                         for (Map.Entry<String, ClientSocketThread> stringClientSocketThreadEntry : clientMap.entrySet()) {
                             ClientSocketThread socketThread = stringClientSocketThreadEntry.getValue();
                             ObjectOutputStream userObjectOutputStream = socketThread.getOutputStream();
+                            logger.info(message.getUser().getEmail()+" user disconnect");
                             userObjectOutputStream.writeObject(message);
                         }
                             streaming = false;
@@ -74,7 +80,7 @@ public class ClientSocketThread extends Thread {
                         sendConnetionMessage(login);
                         clientMap.put(login.getEmail(), this);
                         Message returnMessage = new Message(MessageType.LOGINIZATION, login, getUsersEmailSet());
-                        returnMessage.getUsersEmailSet().forEach(System.out::println);
+                        logger.info(user.getEmail() + " user has join");
                         outputStream.writeObject(returnMessage);
                         break;
                     }
@@ -84,17 +90,20 @@ public class ClientSocketThread extends Thread {
                         User register = authorizationService.register(user);
                         sendConnetionMessage(register);
                         clientMap.put(register.getEmail(), this);
+                        logger.info(user.getEmail()+" has registrated and join");
                         outputStream.writeObject(new Message(MessageType.REGISTRATION, register, getUsersEmailSet()));
                         break;
                     }
                     case PUBLIC_MESSAGE: {
-                        System.out.println("message received");
+                        System.out.println("public message received");
                         handlePublicMessage(inputMessage);
                         break;
                     }
                     case PRIVATE_MESSAGE: {
                         String emailOfSander = messageUser.getEmail();
                         String emailOfReceiver = inputMessage.getReceiver();
+
+                        logger.info(emailOfReceiver+" write private message to "+emailOfReceiver);
                         Message message = new Message(MessageType.PRIVATE_MESSAGE, inputMessage.getText(), emailOfReceiver, emailOfSander);
 
                         writeMessage(emailOfSander, message);
@@ -106,9 +115,9 @@ public class ClientSocketThread extends Thread {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+          logger.error("ClientSocketTread ",e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("ClientSocketTread ",e);
         }
 
 
@@ -120,9 +129,9 @@ public class ClientSocketThread extends Thread {
             ClientSocketThread socketThread = stringClientSocketThreadEntry.getValue();
             ObjectOutputStream userObjectOutputStream = socketThread.getOutputStream();
             System.out.println("message send" + publicMessage.toString());
-            publicMessage.setUsersEmailSet(getUsersEmailSet());
             userObjectOutputStream.writeObject(publicMessage);
         }
+        logger.info(inputMessage.getUser().getEmail()+" write public message");
     }
 
     private void sendConnetionMessage(User user) {
