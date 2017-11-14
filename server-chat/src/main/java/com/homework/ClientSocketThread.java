@@ -1,3 +1,5 @@
+package com.homework;
+
 import com.homework.entity.Message;
 import com.homework.entity.MessageType;
 import com.homework.entity.User;

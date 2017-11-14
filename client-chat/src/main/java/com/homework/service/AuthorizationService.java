@@ -8,7 +8,8 @@ import com.homework.utils.Context;
  */
 public class AuthorizationService {
 
-    public static final String HOST = "127.0.0.1";
+    //public static final String HOST = "127.0.0.1";
+    public static final String HOST = "18.196.3.178";
     public static final int PORT = 6374;
 
     private ConnectionService getConnectionService() {
